@@ -28,6 +28,7 @@ project/
 ```
 
 <hr>
+<br>
 
 ## <b><u>STEPS</u></b>
 
@@ -51,6 +52,7 @@ fastqc -t 12 \
 ```
 
 <hr>
+<br>
 
 ### Step 1. Read trimming using <b>[Trim Galore](https://github.com/FelixKrueger/TrimGalore)</b>
 Remove adapter sequences, trim low-quality bases, and filter out short or ambiguous reads to improve alignment efficiency and reduce downstream noise.
@@ -79,6 +81,7 @@ trim_galore -j 12 -q 20 --gzip --length 30 --trim-n -o ./out/trimmed/Sample001 -
 ```
 
 <hr>
+<br>
 
 
 ### Step 2. Download [hg38 human genome](https://hgdownload.soe.ucsc.edu/goldenpath/hg38/bigZips/) and create [Hisat2](https://daehwankimlab.github.io/hisat2/) index files
@@ -125,6 +128,7 @@ hisat2 \
 
 
 <hr>
+<br>
 
 ### Step 4: Convert SAM to BAM and Remove Unmapped Reads using [SAMtools](https://www.htslib.org/)
 Filters out unmapped reads (-F 4) and converts to BAM.
@@ -144,6 +148,7 @@ samtools view -@ 12 -b -F 4 \
 ```
 
 <hr>
+<br>
 
 ### Step 5: Fix Mate Pair Information
 Ensures proper pairing information in the BAM file, which is essential for downstream sorting and duplicate removal.
@@ -162,6 +167,7 @@ samtools fixmate -@ 12 -m \
 ```
 
 <hr>
+<br>
 
 ### Step 6: Sort BAM File
 Sorts reads by genomic coordinate. Required for duplicate removal.
@@ -181,6 +187,7 @@ samtools sort -@ 12 -m 5G -O BAM \
 ```
 
 <hr>
+<br>
 
 ### Step 7: Remove PCR Duplicates
 Removes duplicate reads to reduce false quantification.
@@ -201,6 +208,7 @@ samtools markdup -@ 12 -r \
 ```
 
 <hr>
+<br>
 
 ### Step 8: Convert SAM to Final BAM file
 
@@ -218,3 +226,4 @@ samtools view -@ 12 -b \
 ```
 
 <hr>
+<br>

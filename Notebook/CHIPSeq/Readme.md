@@ -27,6 +27,8 @@ project/
     └── bedGraphToBigWig           # Custom bedGraph→bigWig converter
 ```
 
+<hr>
+<br>
 
 ## <b><u>STEPS</u></b>
 WE will skip alignment step here, as its shown in detail in [RNASeq readme file](Notebook/RNASeq/Readme.md). Below are the steps after read alignment. 
@@ -66,6 +68,8 @@ java -jar picard.jar CollectInsertSizeMetrics \
 | `CollectInsertSizeMetrics` | Fragment length distribution check |
 ```
 
+<hr>
+<br>
 
 ### Step 1. Remove chrM, mark duplicates, filter MAPQ 
 - Remove mitochondrial reads
@@ -107,6 +111,9 @@ samtools view -@ 10 -b \
 samtools index ./out/filtered_bams/SAMPLE/SAMPLE_filtered.bam
 ```
 
+<hr>
+<br>
+
 ### Step 2. MACS2 Peak Calling
 
 ```bash
@@ -131,6 +138,9 @@ macs2 callpeak \
 | `--cutoff-analysis` | Generate score distribution for cutoff choice |
 ```
 
+<hr>
+<br>
+
 ### Step 3. Lets generate Tracks to visualize in browser (bedGraph → bigWig)
 
 - Sort the bedGraph
@@ -150,6 +160,9 @@ sort -k1,1 -k2,2n \
   ./out/tracks/SAMPLE/SAMPLE_pileup.bw
 ```
 
+<hr>
+<br>
+
 ### Step 4. Filter Peaks Against ENCODE Blacklist
 
 ```bash
@@ -160,6 +173,9 @@ bedtools intersect -v \
 ```
 
 Here, -v reports only those peaks not overlapping blacklist regions.
+
+<hr>
+<br>
 
 ### Step 5. FRiP Score (Fraction of Reads in Peaks)
 
@@ -182,6 +198,9 @@ featureCounts \
   -o ./out/frip_output/SAMPLE/SAMPLE_readCountInPeaks.txt \
   ./out/filtered_bams/SAMPLE/SAMPLE_filtered.bam
 ```
+
+<hr>
+<br>
 
 ### Step 6. Peak Annotation & Known Motif Enrichment (HOMER)
 
@@ -212,6 +231,9 @@ findMotifsGenome.pl \
   -preparsedDir ./out/homer_output/SAMPLE/preparsed
 ```
 
+<hr>
+<br>
+
 ### Step 7. De Novo Motif Discovery (MEME-ChIP)
 
 - Extract peak sequences
@@ -231,6 +253,9 @@ meme-chip \
   ./out/meme_output/SAMPLE/SAMPLE.fa
 ```
 
+<hr>
+<br>
+
 ### Step 8. Peak–Gene Intersection
 Here we assign peaks to their corresponding genes.
 
@@ -240,3 +265,6 @@ bedtools intersect \
   -b ./in/hg38/hg38.refGene.gtf \
   > ./out/homer_output/SAMPLE/SAMPLE_withAnnotations.bed
 ```
+
+<hr>
+<br>

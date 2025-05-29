@@ -30,6 +30,8 @@ project/
 └── src/
     └── featureCounts/bin/featureCounts # Subread featureCounts binary
 ```
+<hr>
+<br>
 
 ## <b><u>STEPS</u></b>
 WE will skip alignment step here, as its shown in detail in [RNASeq readme file](Notebook/RNASeq/Readme.md). Below are the steps after read alignment. 
@@ -63,6 +65,8 @@ samtools index -@ 12 ./out/mito_output/SAMPLE/SAMPLE_noChrM.bam
 | `-@ 12`        | Use 12 CPU threads.                    |
 ```
 
+<hr>
+<br>
 
 ### Step 1. Duplicate Marking & Filtering with [Picard MarkDuplicates](https://broadinstitute.github.io/picard) + SAMtools
 PCR duplicates are marked (not removed) first, then high-quality, properly paired reads are retained.
@@ -91,6 +95,9 @@ samtools index -@ 12 ./out/duplicate_output/SAMPLE/SAMPLE_filtered.bam
 | `-F 1548` | Remove unmapped/secondary/supplementary/duplicate reads using flag filter mask 1548. |
 | `-q 30`   | MAPQ ≥ 30 (high-confidence alignments).                                              |
 ```
+
+<hr>
+<br>
 
 ### Step 2. Blacklist Filtering with [BEDTools](https://bedtools.readthedocs.io/en/latest/) intersect
 Reads overlapping [ENCODE blacklist regions](https://github.com/igordot/reference-genomes/blob/master/hg38/blacklist.v2.bed) are removed to suppress artefactual signal.
@@ -135,6 +142,9 @@ samtools index -@ 12 ./out/shifted_output/SAMPLE/SAMPLE_shifted_sorted.bam
 After shifting, we need a quantitative signal that can be visualised in IGV/UCSC or used by downstream QC tools. bamCoverage converts the shifted BAM into a continuous bigWig by counting fragments in fixed windows (here 10 bp). Here, raw coverage is confounded by sequencing depth. The option --normalizeUsing BPM (Bins Per Million mapped reads) divides every bin count by total mapped fragments, making tracks from different samples directly comparable without altering the absolute dynamic range.
 In addition, --effectiveGenomeSize excludes Ns and unplaced contigs so that BPM represents reads per mappable million bases, mirroring MACS2’s genome size setting.
 
+<hr>
+<br>
+
 ```bash
 bamCoverage \
   --numberOfProcessors $SLURM_CPUS_PER_TASK \
@@ -148,6 +158,8 @@ bamCoverage \
 
 This step turns a list of read alignments into an accurate, depth-normalised, visually friendly representation of chromatin accessibility that underpins all subsequent quality checks, inter-sample comparisons, and figure generation.
 
+<hr>
+<br>
 
 ### Step 4. Peak Calling with [MACS2](https://github.com/macs3-project/MACS) (Broad Mode)
 Identify accessible chromatin regions.
@@ -173,6 +185,9 @@ macs2 callpeak \
 | `--broad`           | Calls **broad** peaks (enhancers, heterochromatin).     |
 | `--cutoff-analysis` | Generates peak score distribution for cutoff selection. |
 ```
+
+<hr>
+<br>
 
 ### Step 5. Fold-Enrichment & p-Value Tracks
 Compute signal-to-noise tracks (FE) and Poisson p-value tracks, then convert to bigWig.
@@ -200,6 +215,9 @@ bedGraphToBigWig \
 | `_ppois.bw` | -log<sub>10</sub>(Poisson p-value) bigWig. |
 ```
 
+<hr>
+<br>
+
 ### Step 6. FRiP (Fraction of Reads in Peaks) with [featureCounts](https://subread.sourceforge.net/)
 Counts reads overlapping called peaks and computes FRiP, a key QC metric.
 
@@ -222,6 +240,8 @@ featureCounts -p -F SAF \
 | `-F SAF`    | Annotation file is in SAF format.    |
 ```
 
+<hr>
+<br>
 
 ### Step 7. Peak Annotation & Known Motifs with [HOMER](http://homer.ucsd.edu/homer/motif/)
 Annotate peaks relative to genomic features and searches for enriched known motifs.
@@ -247,6 +267,9 @@ findMotifsGenome.pl \
 | `motifs/*`             | Known motif enrichment reports.         |
 ```
 
+<hr>
+<br>
+
 ### Step 8. De-Novo Motif Discovery with [MEME-ChIP](https://meme-suite.org/meme/tools/meme-chip)
 Extracts peak sequences and performs unbiased motif discovery.
 
@@ -266,6 +289,8 @@ meme-chip -oc ./out/meme_output/SAMPLE \
 | `meme_output/SAMPLE/` | MEME, DREME, CentriMo HTML & text reports. |
 ```
 
+<hr>
+<br>
 
 ### Step 9. Peak - Gene Intersection with BEDTools intersect
 Overlaps peak BED with gene annotations (GTF converted on-the-fly) to generate custom gene-centric peak files.
@@ -281,3 +306,6 @@ bedtools intersect -a ./out/homer_output/SAMPLE/SAMPLE.bed \
 | ----------------------- | --------------------------------------- |
 | `*_withAnnotations.bed` | Peaks annotated with overlapping genes. |
 ```
+
+<hr>
+<br>
