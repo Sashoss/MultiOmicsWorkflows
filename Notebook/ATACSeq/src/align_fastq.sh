@@ -27,8 +27,6 @@ while read sample; do
         --paired "${FASTQ_DIR}/${sample}_1.fastq.gz" "${FASTQ_DIR}/${sample}_2.fastq.gz"
 
     # 2) Align & post-process
-    ml purge
-    ml load HISAT2/2.2.1 SAMtools/1.15
     hisat2 \
         -x "${INDEX_PREFIX}" \
         -1 "${TRIM_DIR}/${sample}_1_val_1.fq.gz" \

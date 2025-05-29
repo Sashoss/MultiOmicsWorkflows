@@ -59,8 +59,7 @@ for sample in "${samples[@]}"; do
     #
     # 0) Pre-peak QC: flagstat, idxstats, insert-size, cross-correlation
     #
-    module purge
-    module load SAMtools/1.15
+
     samtools flagstat "${bam_t}" > "${QUALITY_OUT}/${sample}/${sample}.flagstat"
     samtools idxstats "${bam_t}" > "${QUALITY_OUT}/${sample}/${sample}.idxstats"
 
@@ -72,8 +71,7 @@ for sample in "${samples[@]}"; do
         VALIDATION_STRINGENCY=LENIENT
 
     # 1) Remove chrM, mark duplicates, filter MAPQ & proper pairs
-    module purge
-    module load SAMtools/1.15
+
     # remove mitochondrial reads
     samtools view -h "${bam_t}" | grep -v "^.*chrM.*$" \
       | samtools sort -O BAM -o "${FILTERED_BAM_DIR}/${sample}/${sample}_noChrM.bam"
@@ -88,7 +86,6 @@ for sample in "${samples[@]}"; do
         CREATE_INDEX=true \
         VALIDATION_STRINGENCY=LENIENT
 
-    module load SAMtools/1.15
     # keep only proper pairs MAPQ>=30
     samtools view -@ 10 -b -f 2 -q 30 \
         "${FILTERED_BAM_DIR}/${sample}/${sample}_dedup.bam" \
@@ -119,8 +116,6 @@ for sample in "${samples[@]}"; do
 
 
     # 2) MACS2 peak calling
-    module purge
-    module load GCC/10.3.0 OpenMPI/4.1.1 Python/3.9.5 MACS2/2.2.7.1
     macs2 callpeak \
         -t "${bam_t}" \
         -c "${bam_c}" \
@@ -133,9 +128,6 @@ for sample in "${samples[@]}"; do
         --cutoff-analysis
 
     # 3) Generate browser tracks (bedGraph → bigWig)
-    module purge
-    module load GCC/10.3.0
-    module load BEDTools/2.30.0 
     sort -k1,1 -k2,2n \
       "${MACS2_OUT}/${sample}/${sample}_treat_pileup.bdg" \
       > "${TRACKS_OUT}/${sample}/${sample}_pileup.sorted.bdg"
@@ -151,8 +143,6 @@ for sample in "${samples[@]}"; do
       > "${MACS2_OUT}/${sample}/${sample}_noblacklist.narrowPeak"
 
     # 5) FRiP score
-    module purge
-    module load SAMtools/1.15
     # create SAF for peaks
     awk 'BEGIN{FS=OFS="\t"} \
         { if (NF==10) print $4, $1, $2+1, $3, "+"; }' \
@@ -166,8 +156,6 @@ for sample in "${samples[@]}"; do
         "${bam_t}"
 
     # 6) HOMER annotation & motif finding
-    module purge
-    module load homer/4.11.1
     cut -f1-3 "${MACS2_OUT}/${sample}/${sample}_noblacklist.narrowPeak" \
         > "${HOMER_OUT}/${sample}/${sample}.bed"
     annotatePeaks.pl \
@@ -181,21 +169,16 @@ for sample in "${samples[@]}"; do
         -preparsedDir "${HOMER_OUT}/${sample}/preparsed"
 
     # 7) MEME-ChIP motif discovery
-    module purge
-    module load BEDTools/2.30.0
     bedtools getfasta \
         -fi "${REF_GENOME_FA}" \
         -bed "${HOMER_OUT}/${sample}/${sample}.bed" \
         -fo "${MEME_OUT}/${sample}/${sample}.fa"
-    module purge
-    module load MEME-suite/5.5.2-GCC-9.3.0
+
     meme-chip \
         -oc "${MEME_OUT}/${sample}" \
         "${MEME_OUT}/${sample}/${sample}.fa"
 
     # 8) Intersection with gene annotations
-    module purge
-    module load BEDTools/2.30.0
     bedtools intersect \
         -a "${HOMER_OUT}/${sample}/${sample}.bed" \
         -b "${REF_GTF}" \

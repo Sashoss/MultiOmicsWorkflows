@@ -20,8 +20,6 @@ while read sample; do
     mkdir -p "${BAM_DIR}/${sample}"
 
     # 1) Trim adapters
-    ml purge
-    ml load GCCcore/8.3.0 Trim_Galore/0.6.5-Java-11.0.2-Python-3.7.4
     trim_galore \
         -j 4 \
         -q 20 \
@@ -32,8 +30,6 @@ while read sample; do
         "${FASTQ_DIR}/${sample}.fastq"
 
     # 2) Align & post-process
-    ml purge
-    ml load HISAT2/2.2.1 SAMtools/1.15
     hisat2 \
         -x "${INDEX_PREFIX}" \
         -U "${TRIM_DIR}/${sample}_trimmed.fq.gz" \

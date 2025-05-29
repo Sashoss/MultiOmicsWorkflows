@@ -184,26 +184,17 @@ for sample in "${samples[@]}"; do
         -preparsedDir "${HOMER_OUT}/${sample}/preparsed"
 
     # 8) MEME‐ChIP
-    module purge
-    ml load GCC/10.3.0
-    module load BEDTools/2.30.0
     bedtools getfasta \
         -fi "${REF_GENOME_FA}" \
         -bed "${HOMER_OUT}/${sample}/${sample}.bed" \
         -fo "${MEME_OUT}/${sample}/${sample}.fa"
 
-    module purge
-    ml load GCC/9.3.0
-    ml load MEME-suite/5.5.2-GCC-9.3.0
     meme-chip \
         -meme-p 12 \
         -oc "${MEME_OUT}/${sample}" \
         "${MEME_OUT}/${sample}/${sample}.fa"
 
     # 9) Intersection with gene annotations
-    module purge
-    ml load GCC/10.3.0
-    module load BEDTools/2.30.0
     bedtools intersect \
         -a "${HOMER_OUT}/${sample}/${sample}.bed" \
         -b "${REF_GTF}" \

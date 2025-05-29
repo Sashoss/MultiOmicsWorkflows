@@ -20,8 +20,7 @@ mkdir -p "${TRIM_DIR}" "${SUMMARY_DIR}" "${BAM_DIR}"
 while read sample; do
     mkdir -p "${BAM_DIR}/${sample}"
     # 1) Trim adapters
-    ml purge
-    ml load GCCcore/8.3.0 Trim_Galore/0.6.5-Java-11.0.2-Python-3.7.4
+
     trim_galore \
         -j 4 \
         -q 20 \
@@ -32,8 +31,7 @@ while read sample; do
         --paired "${FASTQ_DIR}/${sample}_1.fastq.gz" "${FASTQ_DIR}/${sample}_2.fastq.gz"
 
     # 2) Align & post-process
-    ml purge
-    ml load HISAT2/2.2.1 SAMtools/1.15
+
     hisat2 \
         -x "${INDEX_PREFIX}" \
         -1 "${TRIM_DIR}/${sample}_1_val_1.fq.gz" \
