@@ -1,21 +1,8 @@
-#!/bin/bash
-#SBATCH --account=gdleelab
-#SBATCH --partition=himem               
-#SBATCH --mem=100G  
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --job-name atacseq_alignment
-#SBATCH --time=1-12:00:00
-#SBATCH --mail-user=ambuj.kumar@nationwidechildrens.org
-#SBATCH --mail-type=ALL
-
-set -euo pipefail
 
 
 SAMPLE_LIST="./in/ids_ATACSeq.txt"
 
-PROJECT_DIR="/home/gdwanglab/axk201/personal_projects/MultiOmicsWorkflow/Notebook/ATACSeq"
+PROJECT_DIR="ppath"
 FASTQ_DIR="${PROJECT_DIR}/in/FASTQ"
 TRIM_DIR="${PROJECT_DIR}/out/trimmed"
 SUMMARY_DIR="${PROJECT_DIR}/out/summary"
@@ -30,8 +17,6 @@ mkdir -p "${TRIM_DIR}" "${SUMMARY_DIR}" "${BAM_DIR}"
 while read sample; do
     mkdir -p "${BAM_DIR}/${sample}"
     # 1) Trim adapters
-    ml purge
-    ml load GCCcore/8.3.0 Trim_Galore/0.6.5-Java-11.0.2-Python-3.7.4
     trim_galore \
         -j 4 \
         -q 20 \

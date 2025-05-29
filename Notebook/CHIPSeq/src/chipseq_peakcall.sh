@@ -1,15 +1,4 @@
 #!/bin/bash
-#SBATCH --account=gdleelab
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --job-name chipseq_peak_call
-#SBATCH --partition=himem
-#SBATCH --mem=100G 
-#SBATCH --time=1-12:00:00
-#SBATCH --mail-user=ambuj.kumar@nationwidechildrens.org
-#SBATCH --mail-type=ALL
-
 set -euo pipefail
 
 # Samples and control 
@@ -19,7 +8,7 @@ samples=(
 default_input="SRR21423921"
 
 # Project structure
-PROJECT_DIR="/home/gdwanglab/axk201/personal_projects/MultiOmicsWorkflow/Notebook/CHIPSeq"
+PROJECT_DIR="ppath_chip"
 BAM_DIR="${PROJECT_DIR}/out/bams"
 MACS2_OUT="${PROJECT_DIR}/out/macs2_output"
 HOMER_OUT="${PROJECT_DIR}/out/homer_output"

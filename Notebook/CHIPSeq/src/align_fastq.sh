@@ -1,20 +1,11 @@
 #!/bin/bash
-#SBATCH --account=gdleelab
-#SBATCH --partition=himem               
-#SBATCH --mem=100G  
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --job-name chipseq_alignment
-#SBATCH --time=1-12:00:00
-#SBATCH --mail-user=ambuj.kumar@nationwidechildrens.org
-#SBATCH --mail-type=ALL
+
 
 set -euo pipefail
 
 SAMPLE_LIST="./in/ids_CHIPSeq.txt"
 
-PROJECT_DIR="/home/gdwanglab/axk201/personal_projects/MultiOmicsWorkflow/Notebook/CHIPSeq"
+PROJECT_DIR="ppath_chip"
 FASTQ_DIR="${PROJECT_DIR}/in/FASTQ"
 TRIM_DIR="${PROJECT_DIR}/out/trimmed"
 SUMMARY_DIR="${PROJECT_DIR}/out/summary"

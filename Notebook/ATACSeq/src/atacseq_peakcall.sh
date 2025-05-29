@@ -1,19 +1,5 @@
 #!/bin/bash
-#SBATCH --account=gdleelab
-#SBATCH --partition=himem               
-#SBATCH --mem=100G  
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --job-name atacseq_pipeline
-#SBATCH --partition=himem
-#SBATCH --mem=200G
-#SBATCH --time=12:00:00
-#SBATCH --mail-user=ambuj.kumar@nationwidechildrens.org
-#SBATCH --mail-type=ALL
 
-module load miniforge3/24.3.0
-conda activate bed2bw
 
 set -euo pipefail
 
@@ -62,7 +48,6 @@ for sample in "${samples[@]}"; do
     done
 
     # 0) ChrM metrics and remove chrM
-    module load SAMtools/1.15
     samtools idxstats -@ 12 "${BAM}" > "${MITO_OUT}/${sample}/${sample}.idxstats"
     grep "^chrM" "${MITO_OUT}/${sample}/${sample}.idxstats" \
          > "${MITO_OUT}/${sample}/${sample}_chrM.log"
@@ -75,7 +60,6 @@ for sample in "${samples[@]}"; do
     samtools index -@ 12 "${MITO_OUT}/${sample}/${sample}_noChrM.bam"
 
     # 1) Mark duplicates & filter
-    ml load picard/2.21.6-Java-11.0.2
     java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
         QUIET=true \
         INPUT="${MITO_OUT}/${sample}/${sample}_noChrM.bam" \
@@ -86,7 +70,6 @@ for sample in "${samples[@]}"; do
         VALIDATION_STRINGENCY=LENIENT \
         TMP_DIR="."
 
-    module load SAMtools/1.15
     samtools view -@ 12 -h -b -F 1548 -q 30 \
         "${DUPLICATE_OUT}/${sample}/${sample}_marked.bam" \
       | samtools sort -@ 12 -O BAM \
@@ -94,26 +77,17 @@ for sample in "${samples[@]}"; do
     samtools index -@ 12 "${DUPLICATE_OUT}/${sample}/${sample}_filtered.bam"
 
     # 2) Remove ENCODE blacklist regions
-    module purge
-    ml load GCC/10.3.0
-    ml load BEDTools/2.30.0
     bedtools intersect -v \
         -abam "${DUPLICATE_OUT}/${sample}/${sample}_filtered.bam" \
         -b "${BLACKLIST_BED}" \
       > "${BLACKLIST_OUT}/${sample}/${sample}_filtered_blacklist.bam"
 
-    module load SAMtools/1.15
     samtools sort -@ 12 -O BAM \
         -o "${BLACKLIST_OUT}/${sample}/${sample}_filtered_blacklist_sorted.bam" \
         "${BLACKLIST_OUT}/${sample}/${sample}_filtered_blacklist.bam"
     samtools index -@ 12 "${BLACKLIST_OUT}/${sample}/${sample}_filtered_blacklist_sorted.bam"
 
     # 3) ATAC‐shift & bigWig
-    module purge
-    ml load GCC/9.3.0
-    
-    ml load OpenMPI/4.0.3
-    ml load deepTools/3.3.1-Python-3.8.2
     
     alignmentSieve \
         --numberOfProcessors $SLURM_CPUS_PER_TASK \
@@ -123,7 +97,6 @@ for sample in "${samples[@]}"; do
         -o ${SHIFTED_OUT}/${sample}/${sample}_filtered_blacklist_shifted.bam
     samtools index -@ 12 "${SHIFTED_OUT}/${sample}/${sample}_filtered_blacklist_shifted.bam"
 
-    module load SAMtools/1.15
     samtools sort -@ 12 -O BAM \
             -o "${SHIFTED_OUT}/${sample}/${sample}_filtered_blacklist_shifted_sorted.bam" \
             "${SHIFTED_OUT}/${sample}/${sample}_filtered_blacklist_shifted_sorted.bam"
@@ -139,10 +112,6 @@ for sample in "${samples[@]}"; do
         -o "${VISUAL_OUT}/${sample}/${sample}_filtered_blacklist_shifted.bw"
 
     # 4) MACS2 broad peak calling
-    module purge
-    ml load GCC/10.3.0
-    ml load OpenMPI/4.1.1
-    ml load MACS2/2.2.7.1
     macs2 callpeak \
         -t "${SHIFTED_OUT}/${sample}/${sample}_filtered_blacklist_shifted_sorted.bam" \
         -f BAMPE \
@@ -199,8 +168,6 @@ for sample in "${samples[@]}"; do
         "${SHIFTED_OUT}/${sample}/${sample}_filtered_blacklist_shifted.bam"
 
     # 7) HOMER annotation & motif finding
-    module purge
-    module load homer/4.11.1
     cut -f1-3 \
         "${MACS2_OUT}/${sample}/${sample}_peaks.broadPeak" \
       > "${HOMER_OUT}/${sample}/${sample}.bed"

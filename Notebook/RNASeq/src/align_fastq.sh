@@ -1,21 +1,11 @@
-#!/bin/bash
-#SBATCH --account=gdleelab
-#SBATCH --partition=himem               
-#SBATCH --mem=100G  
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --job-name rnaseq_alignment
-#SBATCH --time=12:00:00
-#SBATCH --mail-user=ambuj.kumar@nationwidechildrens.org
-#SBATCH --mail-type=ALL
+
 
 set -euo pipefail
 
 
 SAMPLE_LIST="./in/ids_RNASeq.txt"
 
-PROJECT_DIR="/home/gdwanglab/axk201/personal_projects/MultiOmicsWorkflow/Notebook/RNASeq"
+PROJECT_DIR="ppath_rnaseq"
 FASTQ_DIR="${PROJECT_DIR}/in/FASTQ"
 TRIM_DIR="${PROJECT_DIR}/out/trimmed"
 SUMMARY_DIR="${PROJECT_DIR}/out/summary"
