@@ -35,6 +35,11 @@ repo_root/
 <hr>
 <br>
 
+## Locations
+1. RNA-seq data analysis - [Notebook/RNASeq](https://github.com/Sashoss/MultiOmicsWorkflows/tree/main/Notebook/RNASeq)
+2. ATAC-seq data analysis - [Notebook/ATACSeq](https://github.com/Sashoss/MultiOmicsWorkflows/tree/main/Notebook/ATACSeq)
+3. CHIP-seq data analysis - [Notebook/CHIPSeq](https://github.com/Sashoss/MultiOmicsWorkflows/tree/main/Notebook/CHIPSeq)
+
 
 ## Scientific Rationale
 
@@ -43,8 +48,6 @@ repo_root/
 | **ChIP‑Seq** | High‑confidence TF peaks & motifs            | Identify candidate regulatory regions bound by a TF of interest.                             |
 | **ATAC‑Seq** | Accessible chromatin peaks; footprint scores | Filter ChIP peaks to those occurring in open chromatin and predict co‑bound factors.         |
 | **RNA‑Seq**  | Differentially expressed (DE) genes          | Validate regulatory impact by linking accessible ChIP peaks to genes showing coordinated DE. |
-
-Combining these layers sharpens specificity: **a gene whose promoter harbors an accessible ChIP peak for the TF *and* is significantly up‑ or down‑regulated constitutes a high‑confidence direct target.**
 
 <hr>
 <br>
